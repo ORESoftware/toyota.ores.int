@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package myservice;
+option go_package = "./src;proto";
+
+
+// Define your gRPC service.
+service MyService {
+  rpc SendMessage (MessageRequest) returns (MessageResponse);
+}
+
+// Define your request and response message types.
+message MessageRequest {
+  string message_data = 1;
+  // Add more fields as needed
+}
+
+message MessageResponse {
+  string status = 1;
+  // Add more fields as needed
+}
