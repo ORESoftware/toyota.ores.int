@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package myservice;
+option go_package = "../src;proto";
+
+
+service DataIngestService {
+  rpc ingestDataStreamListBiDirectional(stream IngestRequestList) returns (stream IngestResponseList);
+}
+
+message IngestRequest {
+  string messageId = 1;
+  string datasetId = 2;
+  string datasetSchemaId = 3;
+  string name = 4;
+  string namespace = 5;
+  string eventData = 6;
+}
+
+message IngestRequestList {
+  repeated IngestRequest requests = 1;
+}
+
+message IngestResponse {
+  string datasetId = 1;
+  string schemaId = 2;
+  string messageId = 3;
+  string responseCode = 4;
+}
+
+message IngestResponseList {
+  repeated IngestResponse responses = 1;
+}
