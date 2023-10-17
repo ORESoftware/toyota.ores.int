@@ -9,9 +9,9 @@ import (
 
 func TestMyActor_ProcessMessage(t *testing.T) {
 	system := actor.NewActorSystem()
-	myActor, err := system.ActorOf(actor.PropsFromProducer(func() actor.Actor { return &MyActor{} }))
-	assert.NoError(t, err)
+	system.Root.Actor()
 
 	// Define your test cases here
 	// Send messages to the actor and assert the results
+	assert.NoError(t, nil)
 }

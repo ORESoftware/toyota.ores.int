@@ -72,8 +72,9 @@ type MessageResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
-
+	Reply  interface{}
 	Status string `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"` // Add more fields as needed
+
 }
 
 func (x *MessageResponse) Reset() {

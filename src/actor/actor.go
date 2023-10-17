@@ -18,7 +18,7 @@ type MyActor struct {
 
 // Receive handles incoming messages for the actor.
 func (a *MyActor) Receive(ctx actor.Context) {
-	switch msg := ctx.Message().(type) {
+	switch ctx.Message().(type) {
 	case *Message:
 		// Process the gRPC message and send it to Kafka.
 		msgData := []byte("Message data") // Replace with your data

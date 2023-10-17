@@ -16,6 +16,7 @@ message MessageRequest {
 }
 
 message MessageResponse {
-  string status = 1;
+  string Reply = 1;
+  string status = 2;
   // Add more fields as needed
 }

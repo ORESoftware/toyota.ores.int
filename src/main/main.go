@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"github.com/IBM/sarama"
 	"github.com/asynkron/protoactor-go/actor"
 	"github.com/google/wire"
@@ -23,7 +22,7 @@ type MyActor struct {
 
 // Receive handles incoming messages for the actor.
 func (a *MyActor) Receive(ctx actor.Context) {
-	switch msg := ctx.Message().(type) {
+	switch ctx.Message().(type) {
 	case *Message:
 		// Process the gRPC message and send it to Kafka.
 		msgData := []byte("Message data") // Replace with your data
@@ -62,40 +61,19 @@ func provideSaramaProducer() (sarama.AsyncProducer, error) {
 	return producer, nil
 }
 
-type MyGrpcActor struct{}
-
-func (a *MyGrpcActor) Receive(context actor.Context) {
-	switch msg := context.Message().(type) {
-	case *proto.MessageRequest:
-		// Handle the gRPC request, e.g., send a message to another actor
-		response := &proto.MessageResponse{Reply: "Received: " + msg.Message}
-		context.Respond(response)
-	}
+func InitializeMyActor() (*MyActor, error) {
+	wire.Build(actorSet)
+	return nil, nil
 }
 
-type MyService struct {
-	pid *actor.PID
-}
-
-func (s *MyService) mustEmbedUnimplementedMyServiceServer() {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (s *MyService) SendMessage(ctx context.Context, request *proto.MessageRequest) (*proto.MessageResponse, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (s *MyService) MyMethod(ctx context.Context, req *proto.MessageRequest) (*proto.MessageResponse, error) {
-	response, err := s.pid.RequestFuture(req, 5).Result()
-	if err != nil {
-		return nil, err
-	}
-	return response.(*proto.MessageResponse), nil
+func InitializeSaramaProducer() (sarama.AsyncProducer, error) {
+	wire.Build(provideSaramaProducer)
+	return nil, nil
 }
 
 func main() {
+
+	log.Println("he here")
 	// Create a ProtoActor system and start the actor.
 	system := actor.NewActorSystem()
 	context := system.Root
@@ -115,7 +93,15 @@ func main() {
 	grpcServer := grpc.NewServer()
 
 	// Register your gRPC service
-	proto.RegisterMyServiceServer(grpcServer, &MyService{pid: pid})
+	proto.RegisterMyServiceServer(grpcServer, &proto.MyService{Actor: context, Pid: pid})
+
+	if _, err := InitializeMyActor(); err != nil {
+		log.Fatalf("Failed to init actor wire: %v", err)
+	}
+
+	if _, err := InitializeSaramaProducer(); err != nil {
+		log.Fatalf("Failed to init saram: %v", err)
+	}
 
 	// Start the gRPC server
 	if err := grpcServer.Serve(lis); err != nil {
